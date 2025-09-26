@@ -1,0 +1,43 @@
+User
+  ↓ DNS (www.foobar.com -> LB_IP)
+  ↓ HTTPS / HTTP
+    ┌──────────┐
+    │ HAProxy  │  (Load Balancer)
+    └──────────┘
+      ↓      ↓
+  ┌──────┐ ┌──────┐    (App Nodes)
+  │Node1 │ │Node2 │
+  │Nginx │ │Nginx │
+  │App   │ │App   │
+  └──────┘ └──────┘
+     ↓        ↓
+   ┌────────────────┐
+   │  Database(s)    │
+   │ Primary (master)│
+   │ Replica (slave) │
+   └────────────────┘
+Talking points (1–2 minutes):
+Reason for HAProxy: distribute traffic, provide health checks, allow horizontal scaling.
+Load-balancing policies: roundrobin (simple) vs leastconn (better for long-lived connections).
+Active-Active vs Active-Passive: define both and explain keepalived for LB HA.
+DB: primary for writes, replicas for reads; be ready to mention replication lag.
+SPOF to call out: LB (if single), DB primary.
+Screenshot_URL: https://imgur.com/REPLACE_TASK1
+
+Why added:
+- HAProxy: spread load, resilience
+- 2x web/app: scale + redundancy
+- DB primary/replicas: write consistency + read scale
+
+LB:
+- Algorithm: round-robin (evenly cycles through backends)
+- Mode: Active-Active (both nodes serve traffic)
+
+DB cluster:
+- Primary: writes
+- Replicas: reads (eventual consistency)
+
+Issues:
+- SPOF: LB, DB Primary
+- Security: no firewall/HTTPS
+- No monitoring

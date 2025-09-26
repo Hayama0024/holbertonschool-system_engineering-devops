@@ -1,0 +1,26 @@
+User (browser)
+  ↓ DNS lookup (www.foobar.com -> A 8.8.8.8)
+  ↓ TCP 80/443 (HTTP/HTTPS)
+Internet --> 8.8.8.8 (Single Server)
+┌──────────────────────────────────────────────┐
+│ Server (IP 8.8.8.8)                          │
+│  ┌────────────┐   ┌───────────────┐          │
+│  │ Nginx (web)│ → │ App Server    │          │
+│  │ (reverse   │   │ (uWSGI/gunicorn│   MySQL │
+│  │  proxy)    │   │  or Node)      │ ←────── │
+│  └────────────┘   └───────────────┘   │ DB   │
+│         │ filesystem: /var/www/myapp/ │      │
+└──────────────────────────────────────────────┘
+Talking points (1–2 minutes):
+Explain the DNS lookup and that www.foobar.com resolves to A record 8.8.8.8.
+Nginx receives HTTP(S) requests, serves static files and proxies dynamic requests to the app server.
+The app server executes business logic; MySQL stores persistent data.
+Weaknesses: single server is a SPOF, maintenance causes downtime, limited scalability.
+Screenshot_URL: https://imgur.com/REPLACE_TASK0
+
+Summary:
+- www.foobar.com (A → 8.8.8.8)
+- Single server runs Nginx (web), App server (dynamic), App codebase, MySQL (DB)
+- Flow: User → DNS → 8.8.8.8 → Nginx → App → MySQL → Nginx → User
+- Protocols: TCP/IP + HTTP/HTTPS
+- Issues: SPOF, maintenance downtime, no scaling

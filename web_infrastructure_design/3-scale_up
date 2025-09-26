@@ -1,0 +1,34 @@
+Added:
+- 1 server: extra capacity for split tiers
+- 2nd HAProxy: LB cluster (VRRP/keepalived) to remove SPOF
+- Split roles: web (Nginx), app (runtime), DB (MySQL) on separate machines
+  -> better isolation, targeted scaling, security boundaries
+
+Result:
+- Scale web or app tiers independently
+- LB cluster improves availability
+- DB tier optimized for storage & replication
+
+Talking points (1–2 minutes):
+keepalived provides VRRP VIP to avoid LB SPOF.
+split tiers let you scale web/app independently and isolate DB resources.
+Operational notes: use IaC, monitoring, blue/green deploys, DB automated failover.
+Screenshot_URL: https://imgur.com/REPLACE_TASK3
+
+DNS -> VIP (keepalived VRRP)
+↓
+┌──────────────┐ HAProxy A (MASTER)
+│ HAProxy A │ <---> HAProxy B (BACKUP via keepalived)
+└──────────────┘
+↓ ↓
+┌────────┐ ┌────────┐ (Web tier - dedicated)
+│ Web 1 │ │ Web 2 │
+└────────┘ └────────┘
+↓ ↓
+┌────────────────────┐ (App tier - dedicated)
+│ App 1 | App 2 │
+└────────────────────┘
+↓
+┌────────────────────┐ (DB tier - dedicated)
+│ DB Primary | DB Rep │
+└────────────────────┘

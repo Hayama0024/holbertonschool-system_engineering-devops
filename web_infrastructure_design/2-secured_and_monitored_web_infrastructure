@@ -1,0 +1,39 @@
+
+Added:
+- 3 firewalls: edge, LB->App, App->DB (least privilege)
+- HTTPS (SSL cert): encrypt/authenticate traffic
+- Monitoring clients: collect metrics/logs for LB, App, DB
+
+Monitoring QPS:
+- Use Nginx/HAProxy/app metrics; dashboard + alerts
+
+Issues:
+- LB TLS termination only -> plaintext inside unless re-encrypted
+- Single write MySQL -> write bottleneck & failover risk
+- Same components on all servers -> contention & larger blast radiusTalking points (1–2 minutes):
+
+Firewalls: perimeter to block unwanted access, host-level to limit lateral movement, DB firewall to restrict 3306.
+HTTPS: encrypts traffic; mention Let's Encrypt for certs.
+Monitoring: collectors (Prometheus node_exporter or Sumo agent) on every host; use exporters or log shippers.
+QPS monitoring quick note: use Nginx stub_status or HAProxy stats + Prometheus to compute request rate (QPS).
+Screenshot_URL: https://imgur.com/REPLACE_TASK2User (browser)
+↓ DNS -> LB VIP
+↓ HTTPS (443)
+
+┌────────────────────┐
+│ Perimeter Firewall │ <- Firewall 1 (edge)
+└────────────────────┘
+↓
+┌──────────┐
+│ HAProxy │ <- terminates TLS or passes through
+└──────────┘
+↓ ↓
+┌────────┐ ┌────────┐
+│ App1 │ │ App2 │ (host-level firewall = Firewall 2)
+└────────┘ └────────┘
+↓ ↓
+┌──────────────────┐
+│ Database Server │ (Firewall 3 restricts DB port to App subnet)
+└──────────────────┘
+
+Monitoring agents (one per host) -> central collector (Sumo/Prometheus/Loki)
